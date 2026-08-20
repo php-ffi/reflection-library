@@ -21,7 +21,7 @@ Library is available as Composer repository and can be installed using the
 following command in the root of your project as a dev-dependency.
 
 ```sh
-$ composer require ffi/reflection-library --dev
+$ composer require ffi/reflection-library
 ```
 
 ## Usage
