@@ -1,0 +1,36 @@
+name: Security
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  security:
+    name: Security
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.4' ]
+        os: [ ubuntu-latest ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set Git To Use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          ini-values: "memory_limit=-1"
+      - name: Install Dependencies
+        uses: nick-invision/retry@v4
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: composer update --prefer-dist --no-interaction --no-progress
+      # Action
+      - name: Composer Audit
+        run: composer audit --abandoned=report
