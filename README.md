@@ -17,7 +17,7 @@
 
 ## Installation
 
-Library is available as Сomposer repository and can be installed using the
+Library is available as Composer repository and can be installed using the
 following command in the root of your project as a dev-dependency.
 
 ```sh
@@ -26,13 +26,13 @@ $ composer require ffi/reflection-library --dev
 
 ## Usage
 
-A `ReflectionLibrary` is created from the name of a library, which is resolved
-the way the platform would resolve it, or from a pathname.
+A `ReflectionLibrary` is created from a pathname or from the file name of a
+library, spelled the way an `FFI::cdef()` argument is.
 
 ```php
 use FFI\Reflection\ReflectionLibrary;
 
-$library = new ReflectionLibrary('sqlite3');
+$library = new ReflectionLibrary('libsqlite3.so.0');
 
 $library->getFileName(); // "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0"
 ```
@@ -46,33 +46,36 @@ $library->getArchitecture(); // Architecture::Amd64
 $library->getType();         // ReflectionLibraryType::Library
 ```
 
-The same values are available as properties: `$library->bits`, `$library->endianness`
-and so on, throughout the whole API.
+### Export Symbols
 
-### Symbols
+Export symbols are the functions, variables, structures, and so on that a 
+library exports externally. These are (almost) public elements of a specific library.
 
-`getSymbols()` returns the public interface of the library, i.e. the names an
-`FFI::cdef()` declaration is allowed to mention.
+The `getSymbols()` returns the public interface of the library, i.e. the names
+an `FFI::cdef()` declaration is allowed to mention.
 
 ```php
 foreach ($library->getSymbols() as $symbol) {
-    $symbol->getName();    // "sqlite3_open"
-    $symbol->getAddress(); // 0x1F3E
+    $symbol->getName();       // "sqlite3_open"
+    $symbol->getNativeName(); // "sqlite3_open", decorations and all
+    $symbol->getAddress();    // 63473
 }
 
-$library->hasSymbol('sqlite3_open');  // true
-$library->getSymbol('sqlite3_open');  // ReflectionExportSymbol
+$library->hasSymbol('sqlite3_open');    // true
+$library->getSymbol('sqlite3_open');    // ReflectionExportSymbol
 $library->findSymbol('does_not_exist'); // null
 ```
 
-### Imports
+### Library Imports
 
-Every import carries the symbols taken from that particular library.
+An imports are a list of a library's dependencies. Each dependency, in addition 
+to its name (imported library name), has its own list of symbols that the 
+library loads.
 
 ```php
 foreach ($library->getImports() as $import) {
-    $import->getName();       // "libc.so.6"
-    $import->isOptional();    // false
+    $import->getName();    // "libc.so.6"
+    $import->isOptional(); // false
 
     foreach ($import->getSymbols() as $symbol) {
         $symbol->getName();    // "printf"
@@ -81,13 +84,19 @@ foreach ($library->getImports() as $import) {
 }
 
 $library->hasImport('KERNEL32.dll', caseInsensitive: true); // true
+$library->getImport('libc.so.6');                           // ReflectionImport
+$library->findImport('does-not-exist.so');                  // null
 ```
 
 ### Format Specifics
 
-Both symbols and imports are format-specific subclasses carrying whatever the
-format records beyond the common set, so an ELF export also tells its type,
-binding and size, while a PE one tells its ordinal and calling convention.
+Please note that depending on the library type (`*.so`/`*.dll`/`*.dylib`/etc.), 
+it may contain additional type-specific data.
+
+Using this data is not recommended (it may be removed later), but just be aware 
+that this information is available.
+
+For example:
 
 ```php
 use FFI\Reflection\ReflectionLibrary\Reader\ELF\ElfReflectionExportSymbol;
@@ -95,8 +104,9 @@ use FFI\Reflection\ReflectionLibrary\Reader\ELF\ElfReflectionExportSymbol;
 $symbol = $library->getSymbol('sqlite3_open');
 
 if ($symbol instanceof ElfReflectionExportSymbol) {
-    $symbol->getType(); // SymbolType::Func
-    $symbol->getSize(); // 132
+    $symbol->getType();  // SymbolType::Func
+    $symbol->getSize();  // 132
+    $symbol->getIndex(); // 47
 }
 ```
 
@@ -113,32 +123,26 @@ echo $library;
 Library [ <library> <amd64> <little-endian> 64bit libsqlite3.so.0 ] {
   @@ /usr/lib/x86_64-linux-gnu/libsqlite3.so.0
 
-  - Imports [3] {
+  - Imports [2] {
     Import [ libm.so.6 ] {
 
-      - Symbols [23] {
+      - Symbols [2] {
         Symbol [ log10@GLIBC_2.2.5 ]
+        Symbol [ pow@GLIBC_2.2.5 ]
+      }
+    }
+
+    Import [ libc.so.6 ] {
+
+      - Symbols [1] {
+        Symbol [ printf@GLIBC_2.2.5 ]
       }
     }
   }
 
-  - Symbols [68] {
+  - Symbols [2] {
     Symbol [ sqlite3_open ] { 0x0000F7F1 }
+    Symbol [ sqlite3_close ] { 0x0000F8A3 }
   }
-}
-```
-
-### Errors
-
-Every failure is a subclass of `FFI\Reflection\Exception\ReflectionException`,
-which in turn extends the `ReflectionException` of PHP.
-
-```php
-use FFI\Reflection\Exception\LibraryNotFoundException;
-
-try {
-    $library = new ReflectionLibrary('does-not-exist.so');
-} catch (LibraryNotFoundException $e) {
-    // ...
 }
 ```
