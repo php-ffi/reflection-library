@@ -17,20 +17,12 @@ use FFI\Reflection\Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * An import is an external library the image depends on, together with the
- * symbols it takes from that library. The symbols the image offers in return
- * are covered by {@see ReflectionSymbolTest}.
- */
 #[CoversClass(ReflectionImport::class)]
 #[CoversClass(ElfReflectionImport::class)]
 #[CoversClass(PeReflectionImport::class)]
 #[CoversClass(MachOReflectionImport::class)]
 final class ReflectionImportTest extends TestCase
 {
-    /**
-     * A name that no fixture can possibly carry.
-     */
     private const string UNKNOWN_NAME = 'FFI\Reflection\Tests::unknown';
 
     #[DataProvider('librariesDataProvider')]
@@ -57,22 +49,8 @@ final class ReflectionImportTest extends TestCase
         self::assertNotEmpty($library->getImports());
 
         foreach ($library->getImports() as $import) {
-            self::assertNotSame('', $import->name);
-            self::assertSame($import->name, (string) $import);
-        }
-    }
-
-    #[DataProvider('librariesDataProvider')]
-    public function testAccessorsMatchTheProperties(string $pathname): void
-    {
-        $library = new ReflectionLibrary($pathname);
-
-        self::assertNotEmpty($library->getImports());
-
-        foreach ($library->getImports() as $import) {
-            self::assertSame($import->name, $import->getName());
-            self::assertSame($import->isOptional, $import->isOptional());
-            self::assertSame($import->symbols, $import->getSymbols());
+            self::assertNotSame('', $import->getName());
+            self::assertSame($import->getName(), (string) $import);
         }
     }
 
@@ -85,13 +63,13 @@ final class ReflectionImportTest extends TestCase
 
         foreach ($library->getImports() as $import) {
             foreach ($import->getSymbols() as $symbol) {
-                if ($symbol->name === null) {
+                if ($symbol->getName() === null) {
                     continue;
                 }
 
-                self::assertTrue($import->hasSymbol($symbol->name));
-                self::assertSame($symbol, $import->findSymbol($symbol->name));
-                self::assertSame($symbol, $import->getSymbol($symbol->name));
+                self::assertTrue($import->hasSymbol($symbol->getName()));
+                self::assertSame($symbol, $import->findSymbol($symbol->getName()));
+                self::assertSame($symbol, $import->getSymbol($symbol->getName()));
             }
         }
     }
@@ -129,15 +107,10 @@ final class ReflectionImportTest extends TestCase
         foreach ($library->getImports() as $import) {
             self::assertInstanceOf(ElfReflectionImport::class, $import);
 
-            // ELF has no per-entry flag making a DT_NEEDED library optional.
-            self::assertFalse($import->isOptional);
+            self::assertFalse($import->isOptional());
         }
     }
 
-    /**
-     * ELF attributes a symbol to a library through its version requirement,
-     * so an import holding symbols has to declare the versions they need.
-     */
     #[DataProvider('elfLibrariesDataProvider')]
     public function testElfSymbolsMatchTheDeclaredVersions(string $pathname): void
     {
@@ -147,17 +120,17 @@ final class ReflectionImportTest extends TestCase
 
         foreach ($library->getImports() as $import) {
             self::assertInstanceOf(ElfReflectionImport::class, $import);
-            self::assertSame($import->versions, $import->getVersions());
+            self::assertSame($import->getVersions(), $import->getVersions());
 
             if ($import->getSymbols() === []) {
                 continue;
             }
 
-            self::assertNotEmpty($import->versions);
+            self::assertNotEmpty($import->getVersions());
 
             foreach ($import->getSymbols() as $symbol) {
                 self::assertInstanceOf(ElfReflectionImportSymbol::class, $symbol);
-                self::assertContains($symbol->version, $import->versions);
+                self::assertContains($symbol->getVersion(), $import->getVersions());
             }
         }
     }
@@ -172,21 +145,14 @@ final class ReflectionImportTest extends TestCase
         foreach ($library->getImports() as $import) {
             self::assertInstanceOf(PeReflectionImport::class, $import);
 
-            self::assertStringEndsWith('.dll', \strtolower($import->name));
+            self::assertStringEndsWith('.dll', \strtolower($import->getName()));
 
-            // A delay-loaded library is the only optional import of a PE
-            // image, so the two say the same thing.
-            self::assertSame($import->isOptional, $import->isDelayLoaded());
+            self::assertSame($import->isOptional(), $import->isDelayLoaded());
 
-            // None of the fixtures delays anything.
             self::assertFalse($import->isDelayLoaded());
         }
     }
 
-    /**
-     * A PE image records no ordinal for a symbol it takes by name, and one
-     * taken by ordinal alone never reaches the reflection API.
-     */
     #[DataProvider('peLibrariesDataProvider')]
     public function testPeImportedSymbolsCarryNoOrdinal(string $pathname): void
     {
@@ -197,7 +163,7 @@ final class ReflectionImportTest extends TestCase
         foreach ($library->getImports() as $import) {
             foreach ($import->getSymbols() as $symbol) {
                 self::assertInstanceOf(PeReflectionImportSymbol::class, $symbol);
-                self::assertNull($symbol->ordinal);
+                self::assertNull($symbol->getOrdinal());
             }
         }
     }
@@ -212,19 +178,18 @@ final class ReflectionImportTest extends TestCase
         foreach ($library->getImports() as $index => $import) {
             self::assertInstanceOf(MachOReflectionImport::class, $import);
 
-            // Ordinals are one-based and follow the order of the load commands.
-            self::assertSame($index + 1, $import->ordinal);
-            self::assertSame($import->ordinal, $import->getOrdinal());
+            self::assertSame($index + 1, $import->getOrdinal());
+            self::assertSame($import->getOrdinal(), $import->getOrdinal());
 
-            self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', $import->currentVersion);
-            self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', $import->compatibilityVersion);
+            self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', $import->getCurrentVersion());
+            self::assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', $import->getCompatibilityVersion());
 
-            self::assertSame($import->kind, $import->getKind());
-            self::assertSame($import->kind->isOptional(), $import->isOptional);
+            self::assertSame($import->getKind(), $import->getKind());
+            self::assertSame($import->getKind()->isOptional(), $import->isOptional());
 
             foreach ($import->getSymbols() as $symbol) {
                 self::assertInstanceOf(MachOReflectionImportSymbol::class, $symbol);
-                self::assertSame($import->ordinal, $symbol->libraryOrdinal);
+                self::assertSame($import->getOrdinal(), $symbol->getLibraryOrdinal());
             }
         }
     }

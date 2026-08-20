@@ -23,21 +23,11 @@ use FFI\Reflection\ReflectionLibrary\Stream\Stream;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-/**
- * Behaviour of the facade itself: resolving the library, selecting a driver
- * and looking imported libraries and exported symbols up by name. What an
- * individual entry carries is covered by
- * {@see ReflectionLibrary\ReflectionImportTest} and
- * {@see ReflectionLibrary\ReflectionSymbolTest}.
- */
 #[CoversClass(ReflectionLibrary::class)]
 #[CoversClass(LibraryReaderFactory::class)]
 #[CoversClass(ReflectionPrinter::class)]
 final class ReflectionLibraryTest extends TestCase
 {
-    /**
-     * A name that no fixture can possibly carry.
-     */
     private const string UNKNOWN_NAME = 'FFI\Reflection\Tests::unknown';
 
     #[DataProvider('librariesDataProvider')]
@@ -48,12 +38,6 @@ final class ReflectionLibraryTest extends TestCase
         self::assertSame(\realpath($pathname), $library->getFileName());
     }
 
-    /**
-     * Every fixture is laid out as `<Platform>/<architecture>/<file>`, so the
-     * directory it sits in is what the image has to report.
-     *
-     * @return iterable<non-empty-string, array{non-empty-string, int<8, max>, Architecture}>
-     */
     public static function identifiedLibrariesDataProvider(): iterable
     {
         $architectures = [
@@ -80,10 +64,6 @@ final class ReflectionLibraryTest extends TestCase
         }
     }
 
-    /**
-     * @param non-empty-string $pathname
-     * @param int<8, max> $bits
-     */
     #[DataProvider('identifiedLibrariesDataProvider')]
     public function testTheImageIsIdentifiedByTheArchitectureItSitsIn(
         string $pathname,
@@ -96,12 +76,6 @@ final class ReflectionLibraryTest extends TestCase
         self::assertSame($architecture, $library->getArchitecture());
     }
 
-    /**
-     * Every architecture the fixtures are built for runs little endian these
-     * days, including the PowerPC one.
-     *
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('librariesDataProvider')]
     public function testEveryFixtureIsLittleEndian(string $pathname): void
     {
@@ -110,9 +84,6 @@ final class ReflectionLibraryTest extends TestCase
         self::assertSame(Endianness::Little, $library->getEndianness());
     }
 
-    /**
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('librariesDataProvider')]
     public function testEveryFixtureIsALibraryRatherThanAProgram(string $pathname): void
     {
@@ -121,13 +92,6 @@ final class ReflectionLibraryTest extends TestCase
         self::assertSame(ReflectionLibraryType::Library, $library->getType());
     }
 
-    /**
-     * The width of the address is what the reader lays the whole image out
-     * by, so it has to agree with the size of the addresses the symbols
-     * report.
-     *
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('librariesDataProvider')]
     public function testTheWidthOfAWordBoundsTheAddressesOfTheSymbols(string $pathname): void
     {
@@ -144,12 +108,6 @@ final class ReflectionLibraryTest extends TestCase
         }
     }
 
-    /**
-     * The rendering repeats the shape the reflection API of PHP uses, so
-     * every section it opens is closed and counted.
-     *
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('librariesDataProvider')]
     public function testTheRenderingListsEveryImportAndSymbol(string $pathname): void
     {
@@ -190,17 +148,12 @@ final class ReflectionLibraryTest extends TestCase
         self::assertNotEmpty($library->getSymbols());
     }
 
-    /**
-     * Both lists are read through the same stream, so a driver that failed to
-     * rewind between the two calls would corrupt the second one.
-     */
     #[DataProvider('librariesDataProvider')]
     public function testImportsAndSymbolsDoNotDisturbEachOther(string $pathname): void
     {
         $expected = new ReflectionLibrary($pathname);
         $actual = new ReflectionLibrary($pathname);
 
-        // The same data, read in the opposite order.
         $symbols = $actual->getSymbols();
         $imports = $actual->getImports();
 
@@ -232,9 +185,9 @@ final class ReflectionLibraryTest extends TestCase
         self::assertNotEmpty($library->getImports());
 
         foreach ($library->getImports() as $import) {
-            self::assertTrue($library->hasImport($import->name));
-            self::assertSame($import, $library->findImport($import->name));
-            self::assertSame($import, $library->getImport($import->name));
+            self::assertTrue($library->hasImport($import->getName()));
+            self::assertSame($import, $library->findImport($import->getName()));
+            self::assertSame($import, $library->getImport($import->getName()));
         }
     }
 
@@ -246,13 +199,13 @@ final class ReflectionLibraryTest extends TestCase
         self::assertNotEmpty($library->getSymbols());
 
         foreach ($library->getSymbols() as $symbol) {
-            if ($symbol->name === null) {
+            if ($symbol->getName() === null) {
                 continue;
             }
 
-            self::assertTrue($library->hasSymbol($symbol->name));
-            self::assertSame($symbol, $library->findSymbol($symbol->name));
-            self::assertSame($symbol, $library->getSymbol($symbol->name));
+            self::assertTrue($library->hasSymbol($symbol->getName()));
+            self::assertSame($symbol, $library->findSymbol($symbol->getName()));
+            self::assertSame($symbol, $library->getSymbol($symbol->getName()));
         }
     }
 
@@ -287,27 +240,18 @@ final class ReflectionLibraryTest extends TestCase
         $library->getSymbol(self::UNKNOWN_NAME);
     }
 
-    /**
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('elfLibrariesDataProvider')]
     public function testElfLibrariesAreReadByTheElfDriver(string $pathname): void
     {
         self::assertInstanceOf(ElfLibraryReader::class, self::createReader($pathname));
     }
 
-    /**
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('peLibrariesDataProvider')]
     public function testPeLibrariesAreReadByThePeDriver(string $pathname): void
     {
         self::assertInstanceOf(PeLibraryReader::class, self::createReader($pathname));
     }
 
-    /**
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('machOLibrariesDataProvider')]
     public function testMachOLibrariesAreReadByTheMachODriver(string $pathname): void
     {
@@ -328,9 +272,6 @@ final class ReflectionLibraryTest extends TestCase
         new ReflectionLibrary(__DIR__ . '/../composer.json');
     }
 
-    /**
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('librariesDataProvider')]
     public function testDefaultFactoryResolvesADriverForEveryFixture(string $pathname): void
     {
@@ -343,9 +284,6 @@ final class ReflectionLibraryTest extends TestCase
         ]);
     }
 
-    /**
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('librariesDataProvider')]
     public function testEmptyFactorySupportsNothing(string $pathname): void
     {
@@ -355,12 +293,6 @@ final class ReflectionLibraryTest extends TestCase
             ->createFromStream(Stream::createFromPathname($pathname), $pathname);
     }
 
-    /**
-     * A driver has to probe the signature from the beginning of the stream
-     * rather than from wherever the previous one left the position.
-     *
-     * @param non-empty-string $pathname
-     */
     #[DataProvider('librariesDataProvider')]
     public function testDriversProbeIndependentlyOfTheStreamPosition(string $pathname): void
     {
@@ -372,10 +304,6 @@ final class ReflectionLibraryTest extends TestCase
         self::assertSame(self::createReader($pathname)::class, $reader::class);
     }
 
-    /**
-     * @param non-empty-string $pathname
-     * @throws ReflectionException
-     */
     private static function createReader(string $pathname): LibraryReaderInterface
     {
         return LibraryReaderFactory::createDefault()

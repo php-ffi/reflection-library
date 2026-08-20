@@ -50,7 +50,6 @@ final class TypedStreamTest extends TestCase
         self::assertSame(2, $swapped->offset);
         self::assertSame(0x0304, $swapped->uint16());
 
-        // Both objects delegate to the same underlying stream.
         self::assertSame(4, $stream->offset);
     }
 
@@ -109,7 +108,6 @@ final class TypedStreamTest extends TestCase
         self::assertSame(4, $stream->offset);
         self::assertSame(0x0403, $slice->uint16());
 
-        // Rewinding the slice must not disturb the outer stream.
         $slice->offset = 0;
 
         self::assertSame(4, $stream->offset);
@@ -124,7 +122,6 @@ final class TypedStreamTest extends TestCase
 
     public function testUleb128DecodesAMultiByteValue(): void
     {
-        // The canonical example of the DWARF specification.
         $stream = self::create("\xE5\x8E\x26");
 
         self::assertSame(624485, $stream->uleb128());
@@ -181,7 +178,6 @@ final class TypedStreamTest extends TestCase
         self::assertSame(Type::UInt32be, Type::UInt32le->withByteOrder(Endianness::Big));
         self::assertSame(Type::UInt32le, Type::UInt32be->withByteOrder(Endianness::Little));
 
-        // A type without endianness-specific variants is returned as is.
         self::assertSame(Type::UInt8, Type::UInt8->withByteOrder(Endianness::Big));
     }
 }
