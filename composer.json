@@ -1,0 +1,77 @@
+{
+    "name": "ffi/reflection-library",
+    "type": "library",
+    "description": "PHP FFI binary files reflection library",
+    "license": "MIT",
+    "keywords": [
+        "ffi",
+        "reflection",
+        "binary",
+        "abi",
+        "elf",
+        "coff",
+        "macho",
+        "pe",
+        "parser"
+    ],
+    "support": {
+        "source": "https://github.com/php-ffi/reflection-library",
+        "issues": "https://github.com/php-ffi/reflection-library/issues",
+        "docs": "https://github.com/php-ffi/reflection-library/blob/master/README.md"
+    },
+    "authors": [
+        {
+            "name": "Nesmeyanov Kirill",
+            "email": "nesk@xakep.ru",
+            "homepage": "https://nesk.me",
+            "role": "maintainer"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "ffi/location": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "FFI\\Reflection\\": "src"
+        }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "phpat/phpat": "^0.12.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^12.5|^13.0",
+        "symfony/var-dumper": "^7.4|^8.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "FFI\\Reflection\\Tests\\": "tests"
+        }
+    },
+    "scripts-aliases": {
+        "test:unit": ["test", "phpunit", "unit"],
+        "linter:check": ["linter", "stan"],
+        "phpcs:fix": ["phpcs", "cs", "psr", "per"]
+    },
+    "scripts": {
+        "test:unit": "phpunit --testdox",
+        "linter:check": "phpstan analyse --configuration phpstan.neon --memory-limit 256M",
+        "linter:baseline": "@linter:check --generate-baseline",
+        "phpcs:check": "@phpcs:fix --dry-run",
+        "phpcs:fix": "php-cs-fixer fix --config=.php-cs-fixer.php --allow-risky=yes --verbose --diff"
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0.x-dev",
+            "dev-master": "1.0.x-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

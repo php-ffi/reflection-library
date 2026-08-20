@@ -1,0 +1,27 @@
+includes:
+  - phar://phpstan.phar/conf/bleedingEdge.neon
+  - vendor/phpat/phpat/extension.neon
+  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+  - vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+  level: max
+  phpVersion:
+    min: 80400
+    max: 80500
+  strictRules:
+    allRules: true
+  phpat:
+    show_rule_names: true
+    ignore_built_in_classes: true
+  paths:
+    - src
+    - tests/Architecture
+  fileExtensions:
+    - php
+  tmpDir: vendor/.cache.phpstan
+  reportUnmatchedIgnoredErrors: false
+services:
+  -
+    class: FFI\Reflection\Tests\Architecture\ReflectionLibraryArchitectureTest
+    tags:
+      - phpat.test
