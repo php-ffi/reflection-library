@@ -57,7 +57,7 @@ final readonly class PeReflectionImportSymbol extends ReflectionImportSymbol
 
     public function __toString(): string
     {
-        if ($this->nativeName !== null) {
+        if ($this->getNativeName() !== null) {
             return parent::__toString();
         }
 

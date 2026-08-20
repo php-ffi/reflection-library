@@ -43,6 +43,6 @@ final class PeReflectionImport extends ReflectionImport
      */
     public function isDelayLoaded(): bool
     {
-        return $this->isOptional;
+        return $this->isOptional();
     }
 }
