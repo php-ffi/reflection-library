@@ -33,7 +33,7 @@ final readonly class ReflectionPrinter
         $header = \sprintf(
             'Library [ %s%dbit %s ] {',
             $this->printModifiers($this->getLibraryModifiers($library)),
-            $library->bits,
+            $library->getBits(),
             \basename($library->getFileName()),
         );
 
@@ -52,7 +52,7 @@ final readonly class ReflectionPrinter
     {
         $result = [];
 
-        foreach ($library->imports as $import) {
+        foreach ($library->getImports() as $import) {
             $result[] = $this->printImport($import);
         }
 
@@ -85,18 +85,18 @@ final readonly class ReflectionPrinter
 
     private function printImport(ReflectionImport $import): string
     {
-        $modifiers = $import->isOptional ? ['optional'] : [];
+        $modifiers = $import->isOptional() ? ['optional'] : [];
 
         $result = \sprintf(
             '%sImport [ %s%s ] {',
             $this->indent(2),
             $this->printModifiers($modifiers),
-            $import->name,
+            $import->getName(),
         );
 
         $symbols = [];
 
-        foreach ($import->symbols as $symbol) {
+        foreach ($import->getSymbols() as $symbol) {
             $symbols[] = $this->printImportSymbol($symbol);
         }
 
@@ -106,7 +106,7 @@ final readonly class ReflectionPrinter
 
     private function printImportSymbol(ReflectionImportSymbol $symbol): string
     {
-        $modifiers = $symbol->isOptional ? ['optional'] : [];
+        $modifiers = $symbol->isOptional() ? ['optional'] : [];
 
         return \sprintf(
             '%sSymbol [ %s%s ]',
@@ -123,7 +123,7 @@ final readonly class ReflectionPrinter
     {
         $result = [];
 
-        foreach ($library->symbols as $symbol) {
+        foreach ($library->getSymbols() as $symbol) {
             $result[] = $this->printExportSymbol($symbol);
         }
 
@@ -139,12 +139,12 @@ final readonly class ReflectionPrinter
             $symbol,
         );
 
-        if ($symbol->forwarder !== null) {
-            return $result . ' { ' . $symbol->forwarder . ' }';
+        if ($symbol->getForwarder() !== null) {
+            return $result . ' { ' . $symbol->getForwarder() . ' }';
         }
 
-        if ($symbol->address !== null) {
-            return $result . \sprintf(' { 0x%08X }', $symbol->address);
+        if ($symbol->getAddress() !== null) {
+            return $result . \sprintf(' { 0x%08X }', $symbol->getAddress());
         }
 
         return $result;
@@ -156,13 +156,13 @@ final readonly class ReflectionPrinter
      */
     private function getLibraryModifiers(ReflectionLibrary $library): array
     {
-        $result = [\strtolower($library->type->name)];
+        $result = [\strtolower($library->getType()->name)];
 
-        if ($library->architecture !== null) {
-            $result[] = \strtolower($library->architecture->name);
+        if ($library->getArchitecture() !== null) {
+            $result[] = \strtolower($library->getArchitecture()->name);
         }
 
-        $result[] = $library->endianness === Endianness::Little
+        $result[] = $library->getEndianness() === Endianness::Little
             ? 'little-endian'
             : 'big-endian';
 
@@ -176,16 +176,16 @@ final readonly class ReflectionPrinter
     {
         $result = [];
 
-        if ($symbol->forwarder !== null) {
+        if ($symbol->getForwarder() !== null) {
             $result[] = 'forwarded';
         }
 
-        if ($symbol->binding === ReflectionSymbolResolution::Weak) {
+        if ($symbol->getBinding() === ReflectionSymbolResolution::Weak) {
             $result[] = 'weak';
         }
 
-        if ($symbol->visibility !== ReflectionSymbolVisibility::Public) {
-            $result[] = \strtolower($symbol->visibility->name);
+        if ($symbol->getVisibility() !== ReflectionSymbolVisibility::Public) {
+            $result[] = \strtolower($symbol->getVisibility()->name);
         }
 
         return $result;
