@@ -17,7 +17,7 @@ use FFI\Reflection\ReflectionLibrary\Stream\StreamInterface;
 final readonly class LibraryReaderFactory
 {
     /**
-     * Drivers of the factory, probed in the order they were registered in.
+     * Drivers of the factory, in the order they were registered in.
      *
      * @var list<LibraryReaderInterface>
      */
@@ -44,7 +44,8 @@ final readonly class LibraryReaderFactory
     }
 
     /**
-     * Gets the driver recognising the image the stream holds.
+     * Gets the first registered driver recognising the image the stream
+     * holds.
      *
      * @param string|null $pathname name of the file behind the stream, used
      *        for error reporting only
