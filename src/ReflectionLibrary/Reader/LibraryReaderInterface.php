@@ -20,11 +20,11 @@ use FFI\Reflection\ReflectionLibrary\Stream\TypedStream;
 interface LibraryReaderInterface
 {
     /**
-     * Checks that the stream contains an image of the format supported by
-     * this driver.
+     * Whether the stream contains an image of the format supported by this
+     * driver.
      *
-     * The check is a cheap one, normally a signature probe, so a positive
-     * result does not promise a well-formed image.
+     * A positive answer means the image is this driver to read, not that it
+     * is well formed.
      */
     public function supports(StreamInterface $stream): bool;
 

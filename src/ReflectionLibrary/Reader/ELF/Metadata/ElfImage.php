@@ -18,10 +18,8 @@ final readonly class ElfImage
          * Whether the program header table holds a `PT_INTERP` entry,
          * i.e. whether the image asks for an interpreter to start it.
          *
-         * The flag is kept instead of the program headers themselves
-         * because it is the only thing read out of them: it is what tells
-         * a position independent executable apart from a library, both of
-         * which are `ET_DYN`.
+         * This is what tells a position independent executable apart from
+         * a library, both of which are `ET_DYN`.
          */
         public bool $hasInterpreter,
         /**

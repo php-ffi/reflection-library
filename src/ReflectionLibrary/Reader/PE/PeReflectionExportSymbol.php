@@ -12,11 +12,11 @@ use FFI\Reflection\ReflectionLibrary\ReflectionSymbolVisibility;
 /**
  * An entry of the export directory of a PE image.
  *
- * Two kinds of entry end up without a spellable
+ * Two kinds of entry carry no spellable
  * {@see ReflectionExportSymbol::$name}. One is declared with the `NONAME`
- * attribute and sits in the export address table without a name at all, so
- * it is reported under a placeholder like `example.#42`. The other carries
- * the decoration of its calling convention, like the `@@24` a MSVC
+ * attribute and sits in the export address table without a name of any
+ * kind, leaving {@see $ordinal} as the only way of addressing it. The other
+ * carries the decoration of its calling convention, like the `@@24` a MSVC
  * `__vectorcall` function gets, which no C declaration can spell out.
  */
 final readonly class PeReflectionExportSymbol extends ReflectionExportSymbol

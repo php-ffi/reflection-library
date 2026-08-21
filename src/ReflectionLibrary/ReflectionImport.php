@@ -53,9 +53,8 @@ abstract class ReflectionImport implements \Reflector
     /**
      * @template TArgImport of self
      * @param iterable<mixed, TArgImport> $imports
-     * @param bool $lowercase some filesystems have case-insensitive file
-     *        (library) names, so in these cases you need to normalize all
-     *        import names (keys) to lowercase
+     * @param bool $lowercase whether the keys are lowercased, which is what
+     *        a case-insensitive lookup calls for
      * @return array<($lowercase is true ? non-empty-lowercase-string : non-empty-string), TArgImport>
      */
     public static function groupByName(iterable $imports, bool $lowercase = false): array

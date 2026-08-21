@@ -94,8 +94,7 @@ final class ReflectionLibrary implements \Reflector
     /**
      * Imports indexed by the name of the library exactly as the image
      * records it, so that `example` and `EXAMPLE` stay two different
-     * entries. The case-insensitive lookup has a table of its own,
-     * {@see $importByLowerNames}.
+     * entries.
      *
      * @var array<non-empty-string, ReflectionImport>
      */
@@ -187,11 +186,8 @@ final class ReflectionLibrary implements \Reflector
     }
 
     /**
-     * Gets the pathname of the file being reflected.
-     *
-     * The constructor takes the name of a library rather than a path and
-     * resolves it the way the platform would, so this is where that name
-     * ended up.
+     * Gets the pathname of the file being reflected, i.e. the one the name
+     * of the library denotes on this platform.
      *
      * @return non-empty-string
      */
@@ -291,9 +287,9 @@ final class ReflectionLibrary implements \Reflector
      * this library does not depend on it.
      *
      * @param non-empty-string $name
-     * @param bool $caseInsensitive some file systems are case-insensitive, so
-     *        to make it easier to find a specific import, you should pass the
-     *        {@see true} explicitly
+     * @param bool $caseInsensitive whether the name matches regardless of
+     *        its case, which is what a case-insensitive file system calls
+     *        for
      * @throws ReflectionException in case of the library cannot be read
      */
     public function findImport(string $name, bool $caseInsensitive = false): ?ReflectionImport
@@ -309,9 +305,9 @@ final class ReflectionLibrary implements \Reflector
      * Gets whether the library depends on an external one with the given name.
      *
      * @param non-empty-string $name
-     * @param bool $caseInsensitive some file systems are case-insensitive, so
-     *        to make it easier to find a specific import, you should pass the
-     *        {@see true} explicitly
+     * @param bool $caseInsensitive whether the name matches regardless of
+     *        its case, which is what a case-insensitive file system calls
+     *        for
      * @throws ReflectionException in case of the library cannot be read
      */
     public function hasImport(string $name, bool $caseInsensitive = false): bool
