@@ -70,7 +70,7 @@ final readonly class ElfLibraryReader implements LibraryReaderInterface
 
         return new CommonLibraryInfo(
             addressSize: $image->header->is64bit ? 8 : 4,
-            endianness: $this->readEndianness($image->header->littleEndian),
+            endianness: Endianness::fromBool($image->header->littleEndian),
             architecture: $this->readArchitecture($image->header->machine),
             type: $this->readObjectType($image),
         );
@@ -234,11 +234,6 @@ final readonly class ElfLibraryReader implements LibraryReaderInterface
         return $symbol->name;
     }
 
-    private function readEndianness(bool $isLittleEndian): Endianness
-    {
-        return $isLittleEndian ? Endianness::Little : Endianness::Big;
-    }
-
     /**
      * @throws ReflectionException in case of the image cannot be read
      */
@@ -260,7 +255,7 @@ final readonly class ElfLibraryReader implements LibraryReaderInterface
         }
 
         $header = $this->readHeader($stream, $identity);
-        $stream = $stream->withByteOrder($this->readEndianness($header->littleEndian));
+        $stream = $stream->withByteOrder(Endianness::fromBool($header->littleEndian));
 
         $sections = $this->readSections($stream, $header);
         $versions = $this->readVersions($stream, $sections);
@@ -286,7 +281,7 @@ final readonly class ElfLibraryReader implements LibraryReaderInterface
         /** @var int<0, 255> $osAbi */
         $osAbi = \ord($identity[7]);
 
-        $stream = $stream->withByteOrder($this->readEndianness($littleEndian));
+        $stream = $stream->withByteOrder(Endianness::fromBool($littleEndian));
         $stream->offset = 16;
 
         $type = $stream->uint16();

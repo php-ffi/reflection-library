@@ -80,7 +80,7 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
 
         return new CommonLibraryInfo(
             addressSize: $header->is64bit ? 8 : 4,
-            endianness: $this->readEndianness($header->littleEndian),
+            endianness: Endianness::fromBool($header->littleEndian),
             architecture: $this->readArchitecture($header->cpuType),
             type: $this->readObjectType($header->fileType),
         );
@@ -197,11 +197,6 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
             : null;
     }
 
-    private function readEndianness(bool $isLittleEndian): Endianness
-    {
-        return $isLittleEndian ? Endianness::Little : Endianness::Big;
-    }
-
     /**
      * @throws ReflectionException in case of the image cannot be read
      */
@@ -232,7 +227,7 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
             throw CorruptedBinaryException::becauseImageIsMalformed('Not a Mach-O image');
         }
 
-        $stream = $stream->withByteOrder($this->readEndianness($littleEndian));
+        $stream = $stream->withByteOrder(Endianness::fromBool($littleEndian));
         $header = $this->readHeader($stream, $is64bit, $littleEndian);
 
         $dylibs = [];

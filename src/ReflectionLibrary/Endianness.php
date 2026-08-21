@@ -40,5 +40,14 @@ enum Endianness
      */
     public const self HOST = IS_LITTLE_ENDIAN
         ? self::Little
-    : self::Big;
+        : self::Big;
+
+    public static function fromBool(bool $isLittleEndian): self
+    {
+        if ($isLittleEndian) {
+            return self::Little;
+        }
+
+        return self::Big;
+    }
 }
