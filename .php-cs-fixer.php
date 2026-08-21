@@ -9,7 +9,8 @@ const PHPCS_DIRECTORIES = [
 ];
 
 const PHPCS_IGNORE_FILES = [
-    // ...
+    // @bug https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/issues/9794
+   __DIR__ . '/src/ReflectionLibrary/Endianness.php',
 ];
 
 $files = Finder::create()

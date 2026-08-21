@@ -62,12 +62,14 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
     {
         $stream->offset = 0;
 
+        // A universal ("fat") archive opens with a magic of its own and holds
+        // several images instead of being one, so this driver does not
+        // recognise it.
         return \in_array($stream->read(4), [
             MachOMagic::MAGIC_32,
             MachOMagic::MAGIC_32_BE,
             MachOMagic::MAGIC_64,
             MachOMagic::MAGIC_64_BE,
-            ...MachOMagic::MAGIC_FAT,
         ], true);
     }
 
