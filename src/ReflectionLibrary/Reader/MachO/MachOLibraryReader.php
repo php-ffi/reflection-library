@@ -284,7 +284,9 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
 
         return new MachOImage(
             header: $header,
-            dylibs: $dylibs,
+            // The slots held by the unnamed commands are dropped only once
+            // every ordinal has been handed out.
+            dylibs: \array_values(\array_filter($dylibs)),
             symbols: $symbols,
             exports: $exports,
         );
@@ -330,10 +332,14 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
     }
 
     /**
+     * Reads a single dylib load command, or gets {@see null} in case of its
+     * `lc_str` points at nothing, which leaves the dependency unnamed and
+     * therefore unusable.
+     *
      * @param int<1, max> $ordinal
      * @throws ReflectionException in case of the image cannot be read
      */
-    private function readDylib(TypedStream $command, DylibKind $kind, int $ordinal): Dylib
+    private function readDylib(TypedStream $command, DylibKind $kind, int $ordinal): ?Dylib
     {
         $command->offset = 8;
 
@@ -346,8 +352,12 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
         $command->offset = $nameOffset;
         $name = $command->string();
 
+        if ($name === '') {
+            return null;
+        }
+
         return new Dylib(
-            name: $name === '' ? '<unknown>' : $name,
+            name: $name,
             kind: $kind,
             currentVersion: $current,
             compatibilityVersion: $compatibility,
