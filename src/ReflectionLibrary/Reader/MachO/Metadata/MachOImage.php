@@ -37,7 +37,7 @@ final readonly class MachOImage
 
     /**
      * Gets the library the given ordinal references, or {@see null} in case
-     * of the ordinal is one of the reserved values.
+     * of the image declares none under it.
      */
     public function findDylibByOrdinal(int $ordinal): ?Dylib
     {
