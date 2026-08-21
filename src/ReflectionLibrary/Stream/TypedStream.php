@@ -292,7 +292,8 @@ final class TypedStream implements StreamInterface
     }
 
     /**
-     * Runs the given handler and restores the position afterwards.
+     * Result of the given handler, taken without moving the stream: the
+     * position is the one it had before.
      *
      * @template TResult of mixed
      * @param callable(self): TResult $handler

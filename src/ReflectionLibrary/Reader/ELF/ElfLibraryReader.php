@@ -316,8 +316,11 @@ final readonly class ElfLibraryReader implements LibraryReaderInterface
     }
 
     /**
-     * Looks the program header table up for a `PT_INTERP` entry, which only
-     * a program carries.
+     * Whether the image asks for an interpreter to start it, which only a
+     * program does.
+     *
+     * The `PT_INTERP` entry of the program header table is where the
+     * format records the request.
      *
      * @throws ReflectionException in case of the image cannot be read
      */

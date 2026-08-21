@@ -34,7 +34,7 @@ use FFI\Reflection\ReflectionLibrary\Stream\TypedStream;
 final class ReflectionLibrary implements \Reflector
 {
     /**
-     * Gets the pathname of the binray file being reflected.
+     * Pathname of the binary file being reflected.
      *
      * @var non-empty-string
      */

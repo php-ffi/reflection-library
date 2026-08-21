@@ -36,7 +36,8 @@ abstract readonly class ReflectionExportSymbol extends ReflectionSymbol
          */
         private ?string $forwarder,
         /**
-         * How the definition behaves when several images.
+         * How the definition behaves when several images offer the same
+         * symbol.
          */
         private ?ReflectionSymbolResolution $binding,
         /**

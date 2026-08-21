@@ -62,7 +62,8 @@ final readonly class ReflectionPrinter
     }
 
     /**
-     * Wraps the rendered entries into a counted block.
+     * A block of the given entries, titled and counted the way the
+     * reflection API of PHP titles its own.
      *
      * @param non-empty-string $title
      * @param int<0, max> $depth

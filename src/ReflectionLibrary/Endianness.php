@@ -34,9 +34,6 @@ enum Endianness
 
     /**
      * Order the machine running this code uses.
-     *
-     * You didn't know you could do this either? Me neither... =)
-     * This is magic shit, available since PHP 8.3
      */
     public const self HOST = IS_LITTLE_ENDIAN
         ? self::Little
