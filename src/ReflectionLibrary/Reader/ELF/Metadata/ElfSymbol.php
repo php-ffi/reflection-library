@@ -73,6 +73,6 @@ final readonly class ElfSymbol
      */
     public function isUndefined(): bool
     {
-        return $this->section === 0;
+        return $this->section === ElfSymbolInfo::SHN_UNDEF;
     }
 }

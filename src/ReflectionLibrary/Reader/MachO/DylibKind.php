@@ -42,11 +42,6 @@ enum DylibKind
     case LoadUpward;
 
     /**
-     * Kind of a dependency the loader has to have.
-     */
-    public const self DEFAULT = self::Load;
-
-    /**
      * Gets whether the loader is allowed to continue without the library.
      */
     public function isOptional(): bool

@@ -165,14 +165,17 @@ final readonly class ElfLibraryReader implements LibraryReaderInterface
         }
     }
 
+    /**
+     * @param int<0, 3> $visibility the two bits the `st_other` field reserves
+     *        for the visibility, so every value is a `STV_*` constant
+     */
     private function readVisibility(int $visibility): ReflectionSymbolVisibility
     {
         return match ($visibility) {
+            ElfSymbolInfo::STV_DEFAULT => ReflectionSymbolVisibility::Public,
             ElfSymbolInfo::STV_INTERNAL => ReflectionSymbolVisibility::Internal,
             ElfSymbolInfo::STV_HIDDEN => ReflectionSymbolVisibility::Private,
             ElfSymbolInfo::STV_PROTECTED => ReflectionSymbolVisibility::Protected,
-            // The field is two bits wide, so nothing else can appear.
-            default => ReflectionSymbolVisibility::Public,
         };
     }
 
@@ -576,7 +579,7 @@ final readonly class ElfLibraryReader implements LibraryReaderInterface
             /** @var int<0, 15> $binding */
             $binding = $information >> 4;
             /** @var int<0, 3> $visibility */
-            $visibility = $other & 0x03;
+            $visibility = $other & ElfSymbolInfo::MASK_VISIBILITY;
 
             $result[] = new ElfSymbol(
                 name: $strings->string(),

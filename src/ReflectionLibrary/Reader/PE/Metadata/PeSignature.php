@@ -26,12 +26,6 @@ final class PeSignature
     public const int E_LFANEW_OFFSET = 0x3C;
 
     /**
-     * Size of the `IMAGE_FILE_HEADER` structure, which the optional header
-     * follows.
-     */
-    public const int FILE_HEADER_SIZE = 20;
-
-    /**
      * Offset of the optional header relative to the NT headers, i.e. behind
      * the signature and the file header.
      */

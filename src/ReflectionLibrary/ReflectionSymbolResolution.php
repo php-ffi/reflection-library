@@ -31,10 +31,4 @@ enum ReflectionSymbolResolution
      * every library ends up sharing the very same one.
      */
     case Unique;
-
-    /**
-     * Behaviour reported where the format records no arbitration rules of
-     * its own.
-     */
-    public const self DEFAULT = self::Global;
 }

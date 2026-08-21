@@ -33,9 +33,4 @@ enum ReflectionLibraryType
      * loadable, so there is no reason to tell one from another here.
      */
     case Other;
-
-    /**
-     * Kind reported for a file whose own is none of the above.
-     */
-    public const self DEFAULT = self::Other;
 }

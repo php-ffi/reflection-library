@@ -384,7 +384,7 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
         $result = [];
 
         for ($i = 0; $i < $count; ++$i) {
-            $entries->offset = $i * 40;
+            $entries->offset = $i * PeSignature::SECTION_HEADER_SIZE;
 
             $result[] = new SectionHeader(
                 name: $entries->string(8),

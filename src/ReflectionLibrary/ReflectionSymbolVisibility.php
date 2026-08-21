@@ -39,12 +39,6 @@ enum ReflectionSymbolVisibility
     case Internal;
 
     /**
-     * Visibility reported where the format records no distinction of its
-     * own.
-     */
-    public const self DEFAULT = self::Public;
-
-    /**
      * Gets whether a symbol of this visibility is offered to consumers,
      * i.e. belongs to the public interface of the library.
      */
