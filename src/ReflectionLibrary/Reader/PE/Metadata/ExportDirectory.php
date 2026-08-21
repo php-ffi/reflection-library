@@ -14,8 +14,13 @@ final readonly class ExportDirectory
         /**
          * Resolved value of the `Name` field, i.e. the name the
          * library gives itself, which may differ from its file name.
+         *
+         * Equals {@see null} in case of the field points outside of every
+         * section of the image, which leaves the image unnamed.
+         *
+         * @var non-empty-string|null
          */
-        public string $name,
+        public ?string $name,
         /**
          * Value of the `Base` field, i.e. the ordinal of the first
          * entry of the export address table.

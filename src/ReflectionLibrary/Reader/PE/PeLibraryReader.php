@@ -437,10 +437,19 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
                 break;
             }
 
+            $name = $this->findString($stream, $sections, $library);
+
+            // A descriptor whose name points outside of every section names
+            // no library at all, so the symbols behind it cannot be
+            // attributed to one either.
+            if ($name === null) {
+                continue;
+            }
+
             // The import name table is optional: a bound image may carry the
             // address table alone, which still holds the original thunks.
             $result[] = new ImportDescriptor(
-                library: $this->readString($stream, $sections, $library),
+                library: $name,
                 thunks: $this->readThunks($stream, $sections, $optional, $names !== 0 ? $names : $addresses),
                 isDelayLoaded: false,
             );
@@ -490,8 +499,17 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
                 $addresses = $addresses === 0 ? 0 : \max(0, $addresses - $optional->base);
             }
 
+            $name = $this->findString($stream, $sections, $library);
+
+            // A descriptor whose name points outside of every section names
+            // no library at all, so the symbols behind it cannot be
+            // attributed to one either.
+            if ($name === null) {
+                continue;
+            }
+
             $result[] = new ImportDescriptor(
-                library: $this->readString($stream, $sections, $library),
+                library: $name,
                 thunks: $this->readThunks($stream, $sections, $optional, $names !== 0 ? $names : $addresses),
                 isDelayLoaded: true,
             );
@@ -580,7 +598,7 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
         $createdAt = $stream->timestamp();
 
         $stream->offset = $offset + 12;
-        $name = $this->readString($stream, $sections, $stream->uint32());
+        $name = $this->findString($stream, $sections, $stream->uint32());
 
         $stream->offset = $offset + 16;
         $base = $stream->uint32();
@@ -638,7 +656,6 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
             // An address inside the export directory is the name of the
             // symbol taking the call over, not code.
             $forwarded = $directory->contains($address);
-            $forwarder = $forwarded ? $this->readString($stream, $sections, $address) : null;
 
             /** @var int<0, max> $ordinal */
             $ordinal = \max(0, $base + $index);
@@ -647,7 +664,7 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
                 name: $names[$index] ?? null,
                 ordinal: $ordinal,
                 address: $forwarded ? null : $address,
-                forwarder: $forwarder === '<unknown>' ? null : $forwarder,
+                forwarder: $forwarded ? $this->findString($stream, $sections, $address) : null,
             );
         }
 
@@ -682,9 +699,9 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
             $stream->offset = $ordinals + $index * 2;
             $ordinal = $stream->uint16();
 
-            $name = $this->readString($stream, $sections, $address);
+            $name = $this->findString($stream, $sections, $address);
 
-            if ($name !== '<unknown>') {
+            if ($name !== null) {
                 $result[$ordinal] = $name;
             }
         }
@@ -751,21 +768,25 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
     }
 
     /**
+     * Reads the null terminated string a relative address points at.
+     *
      * @param list<SectionHeader> $sections
-     * @return non-empty-string
+     * @return non-empty-string|null {@see null} in case of the address
+     *         belongs to no section of the image or names an empty string,
+     *         both of which leave the caller without a name to report
      * @throws ReflectionException in case of the image cannot be read
      */
-    private function readString(TypedStream $stream, array $sections, int $address): string
+    private function findString(TypedStream $stream, array $sections, int $address): ?string
     {
         $offset = $this->findOffset($sections, $address);
 
         if ($offset === null) {
-            return '<unknown>';
+            return null;
         }
 
         $stream->offset = $offset;
         $result = $stream->string();
 
-        return $result === '' ? '<unknown>' : $result;
+        return $result === '' ? null : $result;
     }
 }
