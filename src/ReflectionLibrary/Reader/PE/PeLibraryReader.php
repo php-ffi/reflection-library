@@ -439,9 +439,8 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
 
             $name = $this->findString($stream, $sections, $library);
 
-            // A descriptor whose name points outside of every section names
-            // no library at all, so the symbols behind it cannot be
-            // attributed to one either.
+            // The name is what the loader looks a library up by, so a
+            // descriptor carrying none declares no dependency.
             if ($name === null) {
                 continue;
             }
@@ -501,9 +500,8 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
 
             $name = $this->findString($stream, $sections, $library);
 
-            // A descriptor whose name points outside of every section names
-            // no library at all, so the symbols behind it cannot be
-            // attributed to one either.
+            // The name is what the loader looks a library up by, so a
+            // descriptor carrying none declares no dependency.
             if ($name === null) {
                 continue;
             }
@@ -768,16 +766,20 @@ final readonly class PeLibraryReader implements LibraryReaderInterface
     }
 
     /**
-     * Reads the null terminated string a relative address points at.
+     * Name a relative address of the image points at.
      *
      * @param list<SectionHeader> $sections
-     * @return non-empty-string|null {@see null} in case of the address
-     *         belongs to no section of the image or names an empty string,
-     *         both of which leave the caller without a name to report
+     * @return non-empty-string|null {@see null} in case of the image holds
+     *         no name at that address
      * @throws ReflectionException in case of the image cannot be read
      */
     private function findString(TypedStream $stream, array $sections, int $address): ?string
     {
+        // A relative address of 0 means that the field is not set.
+        if ($address === 0) {
+            return null;
+        }
+
         $offset = $this->findOffset($sections, $address);
 
         if ($offset === null) {

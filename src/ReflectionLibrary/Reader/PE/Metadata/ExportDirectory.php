@@ -15,8 +15,7 @@ final readonly class ExportDirectory
          * Resolved value of the `Name` field, i.e. the name the
          * library gives itself, which may differ from its file name.
          *
-         * Equals {@see null} in case of the field points outside of every
-         * section of the image, which leaves the image unnamed.
+         * Equals {@see null} in case of the image gives itself no name.
          *
          * @var non-empty-string|null
          */
