@@ -313,9 +313,8 @@ final class TypedStream implements StreamInterface
     /**
      * Reads the given number of bytes into an independent in-memory stream.
      *
-     * The result keeps the byte order of this stream but has its own
-     * position, which makes it the tool of choice for walking a table
-     * without disturbing the outer read.
+     * The result keeps the byte order of this stream but has a position of
+     * its own, so the two move independently.
      *
      * @throws CorruptedBinaryException in case of the memory stream cannot be opened
      */

@@ -14,8 +14,8 @@ use FFI\Reflection\ReflectionLibrary\Stream\TypedStream;
  * A driver capable of reading a single binary format.
  *
  * The stream belongs to the caller: a driver neither closes it nor expects to
- * find the position where a previous call left it. Every method is idempotent
- * and cheap to call repeatedly.
+ * find the position where a previous call left it. Every method is
+ * idempotent, so asking the same question twice yields the same answer.
  */
 interface LibraryReaderInterface
 {
@@ -23,8 +23,8 @@ interface LibraryReaderInterface
      * Whether the stream contains an image of the format supported by this
      * driver.
      *
-     * A positive answer means the image is this driver to read, not that it
-     * is well formed.
+     * A positive answer means the image is one this driver reads, not that
+     * it is well formed.
      */
     public function supports(StreamInterface $stream): bool;
 

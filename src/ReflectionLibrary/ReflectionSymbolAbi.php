@@ -34,7 +34,8 @@ enum ReflectionSymbolAbi
     case CDecl;
 
     /**
-     * The first arguments travel in registers and the callee cleans the rest up
+     * The first arguments travel in registers and the callee cleans the
+     * rest up.
      *
      * Matches to {@see \FFI\CType::ABI_FASTCALL}
      */

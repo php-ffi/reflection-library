@@ -45,10 +45,8 @@ enum ReflectionSymbolVisibility
     public const self DEFAULT = self::Public;
 
     /**
-     * Gets whether a symbol of this visibility is offered to consumers.
-     *
-     * Note that a hidden or internal symbol never reaches the reflection
-     * API in the first place, since it is not part of the public interface.
+     * Gets whether a symbol of this visibility is offered to consumers,
+     * i.e. belongs to the public interface of the library.
      */
     public function isExported(): bool
     {
