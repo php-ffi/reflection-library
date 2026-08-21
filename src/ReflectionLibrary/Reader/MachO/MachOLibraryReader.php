@@ -284,8 +284,6 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
 
         return new MachOImage(
             header: $header,
-            // The slots held by the unnamed commands are dropped only once
-            // every ordinal has been handed out.
             dylibs: \array_values(\array_filter($dylibs)),
             symbols: $symbols,
             exports: $exports,
@@ -332,9 +330,10 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
     }
 
     /**
-     * Reads a single dylib load command, or gets {@see null} in case of its
-     * `lc_str` points at nothing, which leaves the dependency unnamed and
-     * therefore unusable.
+     * Dependency declared by a single dylib load command.
+     *
+     * An install name is what the loader looks a library up by, so a command
+     * carrying none declares no usable dependency and gets {@see null}.
      *
      * @param int<1, max> $ordinal
      * @throws ReflectionException in case of the image cannot be read
@@ -348,6 +347,13 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
         $command->offset += 4; // timestamp
         $current = $this->readVersion($command->uint32());
         $compatibility = $this->readVersion($command->uint32());
+
+        // An offset landing inside the fields of the command carries no
+        // string at all: reading it would spell the raw bytes of the header
+        // out as a name.
+        if ($nameOffset < LoadCommandType::DYLIB_NAME_OFFSET) {
+            return null;
+        }
 
         $command->offset = $nameOffset;
         $name = $command->string();
@@ -442,8 +448,8 @@ final readonly class MachOLibraryReader implements LibraryReaderInterface
     }
 
     /**
-     * Walks one node of the dyld export trie, appending every terminal it
-     * finds below it.
+     * Terminals of the dyld export trie below the given node, i.e. the
+     * symbols whose name the path down to them spells out.
      *
      * @param list<ExportEntry> $result
      * @throws ReflectionException in case of the image cannot be read

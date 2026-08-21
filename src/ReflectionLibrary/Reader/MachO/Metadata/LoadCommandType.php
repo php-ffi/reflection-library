@@ -70,5 +70,15 @@ final class LoadCommandType
      */
     public const int PAYLOAD_OFFSET = 8;
 
+    /**
+     * Size of the fixed part of a `dylib_command`, i.e. the offset the
+     * `lc_str` of its name is the first value allowed to point at.
+     *
+     * A string always follows the fields of the command it belongs to, so
+     * an offset below this one names no library and points back into the
+     * header instead.
+     */
+    public const int DYLIB_NAME_OFFSET = 24;
+
     private function __construct() {}
 }
