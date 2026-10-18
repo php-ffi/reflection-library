@@ -5,10 +5,13 @@
     <a href="https://packagist.org/packages/ffi/reflection-library"><img src="https://poser.pugx.org/ffi/reflection-library/version?style=for-the-badge" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/ffi/reflection-library"><img src="https://poser.pugx.org/ffi/reflection-library/v/unstable?style=for-the-badge" alt="Latest Unstable Version"></a>
     <a href="https://packagist.org/packages/ffi/reflection-library"><img src="https://poser.pugx.org/ffi/reflection-library/downloads?style=for-the-badge" alt="Total Downloads"></a>
-    <a href="https://raw.githubusercontent.com/php-ffi/reflection-library/master/LICENSE.md"><img src="https://poser.pugx.org/ffi/reflection-library/license?style=for-the-badge" alt="License MIT"></a>
+    <a href="https://raw.githubusercontent.com/php-ffi/reflection-library/master/LICENSE"><img src="https://poser.pugx.org/ffi/reflection-library/license?style=for-the-badge" alt="License MIT"></a>
 </p>
 <p align="center">
-    <a href="https://github.com/php-ffi/reflection-library/actions"><img src="https://github.com/php-ffi/reflection-library/workflows/build/badge.svg"></a>
+    <a href="https://github.com/php-ffi/reflection-library/actions/workflows/tests.yml"><img src="https://github.com/php-ffi/reflection-library/actions/workflows/tests.yml/badge.svg?branch=master" alt="Tests"></a>
+    <a href="https://github.com/php-ffi/reflection-library/actions/workflows/static-analysis.yml"><img src="https://github.com/php-ffi/reflection-library/actions/workflows/static-analysis.yml/badge.svg?branch=master" alt="Static Analysis"></a>
+    <a href="https://github.com/php-ffi/reflection-library/actions/workflows/codestyle.yml"><img src="https://github.com/php-ffi/reflection-library/actions/workflows/codestyle.yml/badge.svg?branch=master" alt="CodeStyle"></a>
+    <a href="https://github.com/php-ffi/reflection-library/actions/workflows/security.yml"><img src="https://github.com/php-ffi/reflection-library/actions/workflows/security.yml/badge.svg?branch=master" alt="Security"></a>
 </p>
 
 ## Requirements
