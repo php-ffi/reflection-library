@@ -176,9 +176,18 @@ final class ReflectionLibrary implements \Reflector
      */
     private static function getPathname(string $library): string
     {
+        // An existing file is read as is, because a binary of any format can be
+        // reflected, not only the one the dynamic linker of this platform loads.
+        // The locator rejects such a file, for example an ELF image on Windows.
+        if ($library !== '' && \is_file($library)) {
+            $pathname = \realpath($library);
+
+            return $pathname === false ? $library : $pathname;
+        }
+
         $pathname = Locator::pathname($library);
 
-        if ($pathname === null || $pathname === '') {
+        if ($pathname === null) {
             throw LibraryNotFoundException::becauseNameIsNotResolvable($library);
         }
 
